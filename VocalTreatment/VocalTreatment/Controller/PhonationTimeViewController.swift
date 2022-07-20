@@ -11,7 +11,6 @@ import SnapKit
 
 final class PhonationTimeViewController: UIViewController {
 	private let timeLabel = UILabel()
-	private let timeControlStack = UIStackView()
 	private let plusButton = UIButton()
 	private let minusButton = UIButton()
 	private let playButton = UIButton()
@@ -60,6 +59,9 @@ final class PhonationTimeViewController: UIViewController {
 	}
 
 	private func configureButtons() {
+		let timeControlStack = UIStackView(arrangedSubviews: [plusButton, minusButton])
+		let stack = UIStackView(arrangedSubviews: [timeLabel, timeControlStack, playButton])
+
 		plusButton.setTitle("+30", for: .normal)
 		plusButton.backgroundColor = .systemMint
 		plusButton.layer.cornerRadius = 10
@@ -68,14 +70,13 @@ final class PhonationTimeViewController: UIViewController {
 		minusButton.backgroundColor = .systemPink
 		minusButton.layer.cornerRadius = 10
 
-		let timeControlStack = UIStackView(arrangedSubviews: [plusButton, minusButton])
-
 		timeControlStack.axis = .horizontal
 		timeControlStack.distribution = .fillEqually
 		timeControlStack.spacing = 16
 
 		timeControlStack.snp.makeConstraints { make in
 			make.height.equalTo(50)
+			make.width.equalTo(stack)
 		}
 
 		self.changeTimeLabel()
@@ -86,7 +87,6 @@ final class PhonationTimeViewController: UIViewController {
 		playButton.isEnabled = time > 0
 		playButton.backgroundColor = playButton.isEnabled ? .systemGreen : .systemGray4
 
-		let stack = UIStackView(arrangedSubviews: [timeLabel, timeControlStack, playButton])
 
 		stack.axis = .vertical
 		stack.distribution = .fillProportionally
