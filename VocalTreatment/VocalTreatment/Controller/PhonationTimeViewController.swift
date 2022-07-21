@@ -20,8 +20,11 @@ final class PhonationTimeViewController: UIViewController {
 
 	private var distance = 0
 	private var time = 0
+	private let timeValue = 10
 	private var isRunning = false
-    
+
+	private let audioController = AudioController()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .systemBackground
@@ -62,11 +65,11 @@ final class PhonationTimeViewController: UIViewController {
 		let timeControlStack = UIStackView(arrangedSubviews: [plusButton, minusButton])
 		let stack = UIStackView(arrangedSubviews: [timeLabel, timeControlStack, playButton])
 
-		plusButton.setTitle("+30", for: .normal)
+		plusButton.setTitle("+\(timeValue)", for: .normal)
 		plusButton.backgroundColor = .systemMint
 		plusButton.layer.cornerRadius = 10
 
-		minusButton.setTitle("-30", for: .normal)
+		minusButton.setTitle("-\(timeValue)", for: .normal)
 		minusButton.backgroundColor = .systemPink
 		minusButton.layer.cornerRadius = 10
 
@@ -86,7 +89,6 @@ final class PhonationTimeViewController: UIViewController {
 		playButton.layer.cornerRadius = 10
 		playButton.isEnabled = time > 0
 		playButton.backgroundColor = playButton.isEnabled ? .systemGreen : .systemGray4
-
 
 		stack.axis = .vertical
 		stack.distribution = .fillProportionally
@@ -111,12 +113,19 @@ final class PhonationTimeViewController: UIViewController {
 				self.playButton.backgroundColor = .systemGreen
 
 				self.eaterBox.layer.removeAllAnimations()
+				print("Stop")
+				self.audioController.stop()
 			} else {
+				print("Start")
 				self.playButton.setTitle("Stop", for: .normal)
 				self.playButton.backgroundColor = .systemRed
 
-				UIView.animate(withDuration: 1, delay: 0) {
-					self.eaterBox.center.y += 100
+				self.audioController.start()
+
+				DispatchQueue.main.async {
+					UIView.animate(withDuration: 1, delay: 0) {
+						self.eaterBox.frame.origin.y = self.cookieBox.frame.maxY
+					}
 				}
 			}
 
@@ -126,7 +135,7 @@ final class PhonationTimeViewController: UIViewController {
 		plusButton.addAction(.init(handler: { [weak self] _ in
 			guard let self = self else { return }
 
-			self.time += 30
+			self.time += self.timeValue
 			self.changeTimeLabel()
 
 			if !self.playButton.isEnabled {
@@ -137,7 +146,7 @@ final class PhonationTimeViewController: UIViewController {
 		minusButton.addAction(.init(handler: { [weak self] _ in
 			guard let self = self else { return }
 
-			self.time = max(self.time - 30, 0)
+			self.time = max(self.time - self.timeValue, 0)
 			self.changeTimeLabel()
 
 			if self.time == 0 {
